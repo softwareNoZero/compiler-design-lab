@@ -1,130 +1,114 @@
-#include <iostream> 
-#include <stack> 
-#include <string> 
-using namespace std; 
- 
-int main() 
-{ 
-  string input; 
- 
-  cout << "Grammar:" << endl; 
-  cout << "S -> aABe" << endl; 
-  cout << "A -> bAc | d" << endl; 
-  cout << "B -> f | epsilon" << endl 
-       << endl; 
- 
-  cout << "Enter input string: "; 
-  cin >> input; 
- 
-  input += "$"; 
- 
-  stack<char> st; 
-  st.push('S'); 
- 
-  int i = 0; 
- 
-  cout << "\nParsing Steps:\n"; 
- 
-  while (!st.empty()) 
-  { 
-    char top = st.top(); 
-    char current = input[i]; 
- 
-    if (top == current) 
-    { 
-      cout << "Match: " << current << endl; 
-      st.pop(); 
-      i++; 
-    } 
- 
-    else if (top == 'S') 
-    { 
-      if (current == 'a') 
-      { 
-        st.pop(); 
- 
-        st.push('e'); 
-        st.push('B'); 
-        st.push('A'); 
-        st.push('a'); 
- 
-        cout << "S -> aABe" << endl; 
-      } 
-      else 
-      { 
-        cout << "Error: No rule for S with " << current << endl; 
-        cout << "String Rejected" << endl; 
-        return 0; 
-      } 
-    } 
- 
-    else if (top == 'A') 
-    { 
-      if (current == 'b') 
-      { 
-        st.pop(); 
- 
-        st.push('c'); 
-        st.push('A'); 
-        st.push('b'); 
- 
-        cout << "A -> bAc" << endl; 
-      } 
-      else if (current == 'd') 
-      { 
-        st.pop(); 
- 
-        st.push('d'); 
- 
-        cout << "A -> d" << endl; 
-      } 
-      else 
-      { 
-        cout << "Error: No rule for A with " << current << endl; 
-        cout << "String Rejected" << endl; 
-        return 0; 
-      } 
-    } 
- 
-    else if (top == 'B') 
-    { 
-      if (current == 'f') 
-      { 
-        st.pop(); 
-        st.push('f'); 
- 
-        cout << "B -> f" << endl; 
-      } 
-      else if (current == 'e') 
-      { 
- 
-        st.pop(); 
- 
-        cout << "B -> epsilon" << endl; 
-      } 
-      else 
-      { 
-        cout << "Error: No rule for B with " << current << endl; 
-        cout << "String Rejected" << endl; 
-        return 0; 
-      } 
-    } 
- 
-    else 
-    { 
-      cout << "Error!" << endl; 
-      cout << "String Rejected" << endl; 
-      return 0; 
-    } 
-  } 
- 
-  if (input[i] == '$') 
-  { 
-    cout << "String Accepted!" << endl; 
-  } 
-else 
+#include <iostream>
+#include <string>
+#include <cstdlib>
+using namespace std;
+
+string input;
+int pos = 0;
+
+void E();
+void Eprime();
+void T();
+void Tprime();
+void F();
+
+void error()
 {
- cout << "String Rejected!" << endl; 
-} 
-return 0; 
+    cout << "String Rejected!" << endl;
+    exit(0);
+}
+
+void E()
+{
+    cout << "E -> T E'" << endl;
+    T();
+    Eprime();
+}
+
+void Eprime()
+{
+    if (input[pos] == '+')
+    {
+        cout << "E' -> + T E'" << endl;
+        pos++;
+        T();
+        Eprime();
+    }
+    else
+    {
+        cout << "E' -> epsilon" << endl;
+    }
+}
+
+void T()
+{
+    cout << "T -> F T'" << endl;
+    F();
+    Tprime();
+}
+
+void Tprime()
+{
+    if (input[pos] == '*')
+    {
+        cout << "T' -> * F T'" << endl;
+        pos++;
+        F();
+        Tprime();
+    }
+    else
+    {
+        cout << "T' -> epsilon" << endl;
+    }
+}
+
+void F()
+{
+    if (input[pos] == '(')
+    {
+        cout << "F -> ( E )" << endl;
+        pos++;
+        E();
+
+        if (input[pos] == ')')
+        {
+            pos++;
+        }
+        else
+        {
+            error();
+        }
+    }
+    else if (input.substr(pos, 2) == "id")
+    {
+        cout << "F -> id" << endl;
+        pos += 2;
+    }
+    else
+    {
+        error();
+    }
+}
+
+int main()
+{
+    cout << "Enter input string: ";
+    cin >> input;
+
+    input += "$";
+
+    cout << "\nParsing Steps:\n";
+
+    E();
+
+    if (input[pos] == '$')
+    {
+        cout << "\nString Accepted!" << endl;
+    }
+    else
+    {
+        cout << "\nString Rejected!" << endl;
+    }
+
+    return 0;
 }
