@@ -123,8 +123,8 @@ int main()
     cout << "String Accepted!" << endl; 
   } 
 else 
-{ 
+{
+ cout << "String Rejected!" << endl; 
 } 
-cout << "String Rejected!" << endl; 
 return 0; 
 }
